@@ -9,7 +9,6 @@ const {
 const HKDF = require("futoin-hkdf");
 const libsignal = require("libsignal");
 const { promisify } = require("util");
-const { KeyPair } = require("../Types");
 
 const KEY_BUNDLE_TYPE = Buffer.from([5]);
 const pbkdf2Promise = promisify(pbkdf2);

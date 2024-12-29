@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
  * TypeScript type alias `Awaitable<T>` tidak relevan dalam CommonJS, jadi tidak diikutsertakan.
  */
 
-// Contact type
+// Contact typef
 const Contact = {
    id: String,
    lid: String,

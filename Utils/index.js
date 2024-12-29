@@ -1,6 +1,5 @@
 const { curve } = require('libsignal');
 const { randomBytes, randomUUID } = require('crypto');
-const { KeyPair, ValueReplacer, ValueReviver, AppDataSync, Fingerprint } = require('../Types');
 
 const generateKeyPair = () => {
    const { pubKey, privKey } = curve.generateKeyPair();

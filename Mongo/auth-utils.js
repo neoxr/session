@@ -1,7 +1,6 @@
 const { Curve, signedKeyPair } = require("./crypto");
 const { randomBytes } = require("crypto");
 const { v4: uuidv4 } = require("uuid");
-const { AuthenticationCreds } = require("../Types");
 
 /**
  * Generate a registration ID.
