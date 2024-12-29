@@ -104,9 +104,8 @@ const { useFirebaseAuthState } = require('session')
 const fs = require('fs')
 const firebaseConfig = JSON.parse(fs.readFileSync('./firebase.json', 'utf-8))
 
-
 async function start() {
-   const { state, saveCreds, deleteCreds } = await useFirebaseAuthState(, 'session')
+   const { state, saveCreds, deleteCreds } = await useFirebaseAuthState(firebaseConfig, 'session')
    
    const client = makeWASocket({
       // your configuration
