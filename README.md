@@ -29,7 +29,7 @@ Add this to dependencies ```package.json``` :
 
 Then call the default function in your bot connection file
 
-```JSON
+```Javascript
 const { usePostgresAuthState } = require('session')
 
 async function start() {
