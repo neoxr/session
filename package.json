@@ -1,0 +1,15 @@
+{
+  "name": "session",
+  "version": "1.0.0",
+  "description": "Baileys Session",
+  "main": "index.js",
+  "repository": "https://github.com/neoxr/session",
+  "author": "Wildan Izzudin",
+  "license": "MIT",
+  "dependencies": {
+    "libsignal": "github:neoxr/sgn",
+    "mongodb": "4.x",
+    "futoin-hkdf": "^1.5.1",
+    "async-lock": "^1.4.1"
+  }
+}
