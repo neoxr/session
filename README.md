@@ -172,9 +172,9 @@ async function start() {
 ## Explanation
 
 **Notes** :
-+ ```deleteCreds``` : used when the device logs out or certain conditions require re-pairing
++ ```deleteCreds``` : used when the device logout or certain conditions require re-pairing
 
 + ```autoDeleteOldData``` : used to delete sessions by excluding creds and app-state-sync
 
 
-> If there is an error make an issue, this script was made by neoxr and I hope this script is useful for everyone.
+> If there is an error make an issue, this script was made by [neoxr](https://github.com/neoxr/session) and I hope this script is useful for everyone.
