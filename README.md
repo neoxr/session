@@ -12,6 +12,7 @@
 
 - [x] PostgreSQL
 - [x] SQL Lite (Recommended)
+- [x] MySQL
 - [x] MongoDB
 - [x] Firebase (Firestore) (Recommended)
 
@@ -70,7 +71,44 @@ Then call the default function in your bot connection file
 const { useSQLiteAuthState } = require('session')
 
 async function start() {
-   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await useSQLiteAuthState('session.db', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await useSQLiteAuthState('session.db', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
+   
+   const client = makeWASocket({
+      // your configuration
+   })
+   
+   client.ev.on('connection.update', async (session) => {
+      if (session.reason === 401) {
+         await deleteCreds()
+         throw new Error('Device Logout')
+      }
+   })
+   
+   client.ev.on('creds.update', saveCreds)
+   
+   setInterval(async () => {
+      await autoDeleteOldData()
+   }, 1 * 60 * 60 * 1000) // checking every 1 hour
+   
+   // your code ...
+}
+```
+
+### MySQL
+
+Add this to dependencies ```package.json``` :
+
+```JSON
+"session": "github:neoxr/session#mysql" 
+```
+
+Then call the default function in your bot connection file
+
+```Javascript
+const { useMySQLAuthState } = require('session')
+
+async function start() {
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await usePostgresAuthState('mysql://xxxxx', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
