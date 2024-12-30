@@ -108,7 +108,7 @@ Then call the default function in your bot connection file
 const { useMySQLAuthState } = require('session')
 
 async function start() {
-   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await usePostgresAuthState('mysql://xxxxx', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await useMySQLAuthState('mysql://xxxxx', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
