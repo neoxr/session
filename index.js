@@ -39,14 +39,7 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
    const readData = async (key) => {
       const doc = await collection.doc(key).get()
       if (doc.exists) {
-         const { value, timestamp } = doc.data()
-         if (maxAge && timestamp) {
-            const currentTime = Date.now()
-            if (currentTime - timestamp > maxAge) {
-               await removeData(key)
-               return null
-            }
-         }
+         const { value } = doc.data()
          return JSON.parse(value, BufferJSON.reviver)
       }
       return null
