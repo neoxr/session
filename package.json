@@ -1,0 +1,14 @@
+{
+	"name": "@neoxr/session",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/neoxr/session.git#mysql"
+	},
+	"author": "Wildan Izzudin",
+	"license": "MIT",
+	"dependencies": {
+		"mysql2": "~3.12.0"
+	}
+}
