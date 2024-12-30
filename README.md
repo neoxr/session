@@ -11,9 +11,9 @@
 ### Database Provider
 
 - [x] PostgreSQL
-- [x] SQL Lite
+- [x] SQL Lite (Recommended)
 - [x] MongoDB
-- [x] Firebase (Firestore)
+- [x] Firebase (Firestore) (Recommended)
 
 ### Installation
 
@@ -33,11 +33,26 @@ Then call the default function in your bot connection file
 const { usePostgresAuthState } = require('session')
 
 async function start() {
-   const { state, saveCreds, deleteCreds } = await usePostgresAuthState('postgres://xxxxx', 'session')
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await usePostgresAuthState('postgres://xxxxx', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
    })
+   
+   client.ev.on('connection.update', async (session) => {
+      if (session.reason === 401) {
+         await deleteCreds()
+         throw new Error('Device Logout')
+      }
+   })
+   
+   client.ev.on('creds.update', saveCreds)
+   
+   setInterval(async () => {
+      await autoDeleteOldData()
+   }, 1 * 60 * 60 * 1000) // checking every 1 hour
+   
+   // your code ...
 }
 ```
 
@@ -55,11 +70,24 @@ Then call the default function in your bot connection file
 const { useSQLiteAuthState } = require('session')
 
 async function start() {
-   const { state, saveCreds, deleteCreds } = await useSQLiteAuthState('session.db', 'session')
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await useSQLiteAuthState('session.db', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
    })
+   
+   client.ev.on('connection.update', async (session) => {
+      if (session.reason === 401) {
+         await deleteCreds()
+         throw new Error('Device Logout')
+      }
+   })
+   
+   client.ev.on('creds.update', saveCreds)
+   
+   setInterval(async () => {
+      await autoDeleteOldData()
+   }, 1 * 60 * 60 * 1000) // checking every 1 hour
    
    // your code ...
 }
@@ -79,11 +107,24 @@ Then call the default function in your bot connection file
 const { useMongoAuthState } = require('session')
 
 async function start() {
-   const { state, saveCreds, deleteCreds } = await useMongoAuthState('mongodb://xxxxx', 'session')
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await useMongoAuthState('mongodb://xxxxx', 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
    })
+   
+   client.ev.on('connection.update', async (session) => {
+      if (session.reason === 401) {
+         await deleteCreds()
+         throw new Error('Device Logout')
+      }
+   })
+   
+   client.ev.on('creds.update', saveCreds)
+   
+   setInterval(async () => {
+      await autoDeleteOldData()
+   }, 1 * 60 * 60 * 1000) // checking every 1 hour
    
    // your code ...
 }
@@ -105,13 +146,35 @@ const fs = require('fs')
 const firebaseConfig = JSON.parse(fs.readFileSync('./firebase.json', 'utf-8))
 
 async function start() {
-   const { state, saveCreds, deleteCreds } = await useFirebaseAuthState(firebaseConfig, 'session')
+   const { state, saveCreds, deleteCreds } = await useFirebaseAuthState(firebaseConfig, 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
    })
    
+   client.ev.on('connection.update', async (session) => {
+      if (session.reason === 401) {
+         await deleteCreds()
+         throw new Error('Device Logout')
+      }
+   })
+   
+   client.ev.on('creds.update', saveCreds)
+   
+   setInterval(async () => {
+      await autoDeleteOldData()
+   }, 1 * 60 * 60 * 1000) // checking every 1 hour
+   
    // your code ...
 }
 ```
 
+## Explanation
+
+**Notes** :
++ ```deleteCreds``` : used when the device logs out or certain conditions require re-pairing
+
++ ```autoDeleteOldData``` : used to delete sessions by excluding creds and app-state-sync
+
+
+> If there is an error make an issue, this script was made by neoxr and I hope this script is useful for everyone.
