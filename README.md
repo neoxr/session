@@ -146,7 +146,7 @@ const fs = require('fs')
 const firebaseConfig = JSON.parse(fs.readFileSync('./firebase.json', 'utf-8))
 
 async function start() {
-   const { state, saveCreds, deleteCreds } = await useFirebaseAuthState(firebaseConfig, 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
+   const { state, saveCreds, deleteCreds, autoDeleteOldData } = await useFirebaseAuthState(firebaseConfig, 'session', 5 * 60 * 60 * 1000) // set maxAge default 24 hours, but this example is 5 hours
    
    const client = makeWASocket({
       // your configuration
