@@ -112,6 +112,13 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
       saveCreds: () => {
          return writeData('creds', creds)
       },
+      getCreds: async (collectionName = customCollectionName) => {
+         const credsData = await readData('creds', getCollection(collectionName))
+         if (credsData) {
+            return credsData
+         }
+         return null
+      },
       deleteCreds: async () => {
          const documents = await collection.listDocuments()
          const deleteTasks = documents.map((doc) => doc.delete())
