@@ -35,6 +35,7 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
 
    const firestore = admin.firestore()
    const collection = firestore.collection(customCollectionName)
+   const getCollection = (name) => firestore.collection(name)
 
    const readData = async (key) => {
       const doc = await collection.doc(key).get()
