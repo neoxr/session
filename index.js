@@ -72,6 +72,10 @@ const useMongoAuthState = async (dbUrl, dbName, maxAge = 24 * 60 * 60 * 1000) =>
 
    const creds = (await readData('creds')) || initAuthCreds()
 
+   const getCreds = async () => {
+      return await readData('creds')
+   }
+
    return {
       state: {
          creds,
@@ -106,7 +110,8 @@ const useMongoAuthState = async (dbUrl, dbName, maxAge = 24 * 60 * 60 * 1000) =>
          return writeData('creds', creds)
       },
       deleteCreds,
-      autoDeleteOldData
+      autoDeleteOldData,
+      getCreds
    }
 }
 
