@@ -112,7 +112,8 @@ const usePostgresAuthState = async (dbConfig, customTableName = 'auth_data', max
          return writeData('creds', creds)
       },
       deleteCreds,
-      autoDeleteOldData
+      autoDeleteOldData,
+      getCreds: () => creds // Menambahkan method getCreds
    }
 }
 
