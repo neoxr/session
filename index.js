@@ -98,9 +98,12 @@ const useSQLiteAuthState = async (dbPath, maxAge = 24 * 60 * 60 * 1000) => {
 
    const creds = (await readData('creds')) || initAuthCreds()
 
-   // Memanggil auto-delete jika maxAge diberikan
    if (maxAge) {
       await autoDeleteOldData()
+   }
+
+   const getCreds = async () => {
+      return await readData('creds')
    }
 
    return {
@@ -137,7 +140,8 @@ const useSQLiteAuthState = async (dbPath, maxAge = 24 * 60 * 60 * 1000) => {
          return writeData('creds', creds)
       },
       deleteCreds,
-      autoDeleteOldData
+      autoDeleteOldData,
+      getCreds
    }
 }
 
