@@ -62,6 +62,7 @@ const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge
 
    const deleteCreds = async () => {
       await removeData('creds')
+      await removeData('backup_creds')
    }
 
    const autoDeleteOldData = async () => {
@@ -69,7 +70,10 @@ const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge
          const cutoffDate = new Date(Date.now() - maxAge).toISOString().slice(0, 19).replace('T', ' ')
          await connection.execute(
             `DELETE FROM ${customTableName} 
-             WHERE \`created_at\` < ? AND \`key\` NOT LIKE 'app-state%'`,
+             WHERE \`created_at\` < ? 
+             AND \`key\` NOT LIKE 'app-state%' 
+             AND \`key\` != 'creds' 
+             AND \`key\` != 'backup_creds'`,
             [cutoffDate]
          )
       }
