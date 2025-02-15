@@ -26,7 +26,6 @@ async function checkAndRequireModules() {
 const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth_data', maxAge = 24 * 60 * 60 * 1000) => {
    const { proto, initAuthCreds, BufferJSON } = await checkAndRequireModules()
 
-   // Initialize Firebase admin SDK
    if (!admin.apps.length) {
       admin.initializeApp({
          credential: admin.credential.cert(firebaseConfig)
@@ -57,7 +56,6 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
 
    const autoDeleteOldData = async () => {
       if (!maxAge) return
-
       const currentTime = Date.now()
       const snapshot = await collection.get()
       const deleteTasks = []
@@ -74,7 +72,6 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
             deleteTasks.push(doc.ref.delete())
          }
       })
-
       await Promise.all(deleteTasks)
    }
 
@@ -110,20 +107,26 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
             }
          }
       },
-      saveCreds: () => {
-         return writeData('creds', creds)
-      },
+      saveCreds: () => writeData('creds', creds),
       getCreds: async (collectionName = customCollectionName) => {
-         const credsData = await readData('creds', getCollection(collectionName))
-         if (credsData) {
-            return credsData
-         }
-         return null
+         return await readData('creds', getCollection(collectionName)) || null
       },
       deleteCreds: async () => {
          const documents = await collection.listDocuments()
-         const deleteTasks = documents.map((doc) => doc.delete())
-         await Promise.all(deleteTasks)
+         await Promise.all(documents.map((doc) => doc.delete()))
+      },
+      backupCreds: async () => {
+         const existingBackup = await readData('backup_creds')
+         if (!existingBackup) {
+            await writeData('backup_creds', creds)
+         }
+      },
+      restoreCreds: async () => {
+         const backupCreds = await readData('backup_creds')
+         if (backupCreds) {
+            await removeData('creds')
+            await writeData('creds', backupCreds)
+         }
       },
       autoDeleteOldData
    }
