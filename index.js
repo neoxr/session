@@ -106,6 +106,24 @@ const useSQLiteAuthState = async (dbPath, maxAge = 24 * 60 * 60 * 1000) => {
       return await readData('creds')
    }
 
+   const backupCreds = async () => {
+      const existingBackup = await readData('backup_creds')
+      if (!existingBackup) {
+         const credsData = await readData('creds')
+         if (credsData) {
+            await writeData('backup_creds', credsData)
+         }
+      }
+   }
+
+   const restoreCreds = async () => {
+      const backupData = await readData('backup_creds')
+      if (backupData) {
+         await removeData('creds')
+         await writeData('creds', backupData)
+      }
+   }
+
    return {
       state: {
          creds,
@@ -141,7 +159,9 @@ const useSQLiteAuthState = async (dbPath, maxAge = 24 * 60 * 60 * 1000) => {
       },
       deleteCreds,
       autoDeleteOldData,
-      getCreds
+      getCreds,
+      backupCreds,
+      restoreCreds
    }
 }
 
