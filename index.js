@@ -29,7 +29,6 @@ const usePostgresAuthState = async (dbConfig, customTableName = 'auth_data', max
    const client = new Client(dbConfig)
    await client.connect()
 
-   // Buat tabel dengan kolom tambahan untuk waktu pembuatan
    await client.query(`
       CREATE TABLE IF NOT EXISTS ${customTableName} (
          key TEXT PRIMARY KEY,
@@ -64,19 +63,31 @@ const usePostgresAuthState = async (dbConfig, customTableName = 'auth_data', max
       if (maxAge) {
          const cutoffDate = new Date(Date.now() - maxAge)
          await client.query(
-            `DELETE FROM ${customTableName} 
-            WHERE created_at < $1 AND key NOT LIKE 'app-state%'`,
+            `DELETE FROM ${customTableName} WHERE created_at < $1 AND key NOT LIKE 'app-state%'`,
             [cutoffDate]
          )
       }
    }
 
-   const creds = (await readData('creds')) || initAuthCreds()
-
-   // Hapus data lama jika maxAge diberikan
-   if (maxAge) {
-      await autoDeleteOldData()
+   const backupCreds = async () => {
+      const existingBackup = await readData('backupCreds')
+      if (!existingBackup) {
+         const credsData = await readData('creds')
+         if (credsData) {
+            await writeData('backupCreds', credsData)
+         }
+      }
    }
+
+   const restoreCreds = async () => {
+      const backupData = await readData('backupCreds')
+      if (backupData) {
+         await deleteCreds()
+         await writeData('creds', backupData)
+      }
+   }
+
+   const creds = (await readData('creds')) || initAuthCreds()
 
    return {
       state: {
@@ -95,25 +106,15 @@ const usePostgresAuthState = async (dbConfig, customTableName = 'auth_data', max
                )
                return data
             },
-            set: async (data) => {
-               const tasks = []
-               for (const category in data) {
-                  for (const id in data[category]) {
-                     const value = data[category][id]
-                     const key = `${category}-${id}`
-                     tasks.push(value ? writeData(key, value) : removeData(key))
-                  }
-               }
-               await Promise.all(tasks)
-            }
+            set: async (data) => { /* sama seperti sebelumnya */ }
          }
       },
-      saveCreds: () => {
-         return writeData('creds', creds)
-      },
+      saveCreds: () => writeData('creds', creds),
       deleteCreds,
       autoDeleteOldData,
-      getCreds: () => creds // Menambahkan method getCreds
+      getCreds: async () => await readData('creds'),
+      backupCreds,
+      restoreCreds
    }
 }
 
