@@ -63,7 +63,11 @@ const usePostgresAuthState = async (dbConfig, customTableName = 'auth_data', max
       if (maxAge) {
          const cutoffDate = new Date(Date.now() - maxAge)
          await client.query(
-            `DELETE FROM ${customTableName} WHERE created_at < $1 AND key NOT LIKE 'app-state%'`,
+            `DELETE FROM ${customTableName} 
+             WHERE created_at < $1 
+             AND key NOT LIKE 'app-state%' 
+             AND key != 'creds' 
+             AND key != 'backup_creds'`,
             [cutoffDate]
          )
       }
