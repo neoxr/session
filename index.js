@@ -65,6 +65,7 @@ const useMongoAuthState = async (dbUrl, dbName, maxAge = 24 * 60 * 60 * 1000) =>
          timestamp: { $lte: cutoffTime },
          $and: [
             { key: { $ne: 'creds' } },
+            { key: { $ne: 'backupCreds' } },
             { key: { $not: /^app-state/ } }
          ]
       })
