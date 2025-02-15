@@ -77,6 +77,7 @@ const useSQLiteAuthState = async (dbPath, maxAge = 24 * 60 * 60 * 1000) => {
 
    const deleteCreds = async () => {
       await removeData('creds')
+      await removeData('backup_creds')
    }
 
    const autoDeleteOldData = async () => {
@@ -85,7 +86,7 @@ const useSQLiteAuthState = async (dbPath, maxAge = 24 * 60 * 60 * 1000) => {
          db.run(
             `
                DELETE FROM auth_data
-               WHERE created_at < ? AND key != 'creds' AND key NOT LIKE 'app-state%'
+               WHERE created_at < ? AND key != 'creds' AND key != 'backup_creds' AND key NOT LIKE 'app-state%'
             `,
             [cutoffTime],
             (err) => {
