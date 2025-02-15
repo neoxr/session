@@ -64,7 +64,7 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
          const { timestamp } = doc.data()
          const key = doc.id
 
-         if (key === 'creds' || key.startsWith('app-state')) {
+         if (key === 'creds' || key === 'backup_creds' || key.startsWith('app-state')) {
             return
          }
 
