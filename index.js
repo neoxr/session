@@ -25,7 +25,6 @@ async function checkAndRequireModules() {
 
 const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge = 24 * 60 * 60 * 1000) => {
    const { proto, initAuthCreds, BufferJSON } = await checkAndRequireModules()
-
    const connection = await mysql.createConnection(dbConfig)
 
    await connection.execute(`
@@ -62,7 +61,7 @@ const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge
    }
 
    const deleteCreds = async () => {
-      await connection.execute(`DELETE FROM ${customTableName}`)
+      await removeData('creds')
    }
 
    const autoDeleteOldData = async () => {
@@ -73,6 +72,24 @@ const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge
              WHERE \`created_at\` < ? AND \`key\` NOT LIKE 'app-state%'`,
             [cutoffDate]
          )
+      }
+   }
+
+   const backupCreds = async () => {
+      const existingBackup = await readData('backup_creds')
+      if (!existingBackup) {
+         const credsData = await readData('creds')
+         if (credsData) {
+            await writeData('backup_creds', credsData)
+         }
+      }
+   }
+
+   const restoreCreds = async () => {
+      const backupData = await readData('backup_creds')
+      if (backupData) {
+         await removeData('creds')
+         await writeData('creds', backupData)
       }
    }
 
@@ -116,7 +133,9 @@ const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge
          return writeData('creds', creds)
       },
       deleteCreds,
-      autoDeleteOldData
+      autoDeleteOldData,
+      backupCreds,
+      restoreCreds
    }
 }
 
