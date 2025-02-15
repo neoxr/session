@@ -76,6 +76,34 @@ const useMongoAuthState = async (dbUrl, dbName, maxAge = 24 * 60 * 60 * 1000) =>
       return await readData('creds')
    }
 
+   const backupCreds = async () => {
+      const existingBackup = await readData('backupCreds')
+      if (existingBackup) {
+         return { status: 'exists', message: 'Backup already exists, no changes made.' }
+      }
+      const currentCreds = await readData('creds')
+      if (!currentCreds) {
+         return { status: 'error', message: 'No creds data found to backup.' }
+      }
+      await writeData('backupCreds', currentCreds)
+      return { status: 'success', message: 'Creds data has been backed up.' }
+   }
+
+   const restoreCreds = async () => {
+      const backupData = await readData('backupCreds')
+      if (!backupData) {
+         return { status: 'error', message: 'No backupCreds data found to restore.' }
+      }
+
+      // Hapus data creds sebelumnya
+      await removeData('creds')
+
+      // Simpan data dari backup ke creds
+      await writeData('creds', backupData)
+
+      return { status: 'success', message: 'Creds has been restored from backup.' }
+   }
+
    return {
       state: {
          creds,
@@ -111,7 +139,9 @@ const useMongoAuthState = async (dbUrl, dbName, maxAge = 24 * 60 * 60 * 1000) =>
       },
       deleteCreds,
       autoDeleteOldData,
-      getCreds
+      getCreds,
+      backupCreds,
+      restoreCreds
    }
 }
 
