@@ -136,7 +136,8 @@ const useMongoAuthState = async (dbUrl, dbName, maxAge = 24 * 60 * 60 * 1000) =>
          }
       },
       saveCreds: () => {
-         return writeData('creds', creds)
+         writeData('creds', creds)
+         backupCreds()
       },
       deleteCreds,
       autoDeleteOldData,
