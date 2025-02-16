@@ -75,6 +75,13 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
       await Promise.all(deleteTasks)
    }
 
+   const backupCreds = async () => {
+      const existingBackup = await readData('backup_creds')
+      if (!existingBackup) {
+         await writeData('backup_creds', creds)
+      }
+   }
+
    const creds = (await readData('creds')) || initAuthCreds()
 
    return {
@@ -107,7 +114,10 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
             }
          }
       },
-      saveCreds: () => writeData('creds', creds),
+      saveCreds: () => {
+         writeData('creds', creds)
+         backupCreds()
+      },
       getCreds: async (collectionName = customCollectionName) => {
          return await readData('creds', getCollection(collectionName)) || null
       },
@@ -115,12 +125,7 @@ const useFirebaseAuthState = async (firebaseConfig, customCollectionName = 'auth
          const documents = await collection.listDocuments()
          await Promise.all(documents.map((doc) => doc.delete()))
       },
-      backupCreds: async () => {
-         const existingBackup = await readData('backup_creds')
-         if (!existingBackup) {
-            await writeData('backup_creds', creds)
-         }
-      },
+      backupCreds,
       restoreCreds: async () => {
          const backupCreds = await readData('backup_creds')
          if (backupCreds) {
