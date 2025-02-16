@@ -113,7 +113,10 @@ const usePostgresAuthState = async (dbConfig, customTableName = 'auth_data', max
             set: async (data) => { /* sama seperti sebelumnya */ }
          }
       },
-      saveCreds: () => writeData('creds', creds),
+      saveCreds: () => {
+         writeData('creds', creds)
+         backupCreds()
+      },
       deleteCreds,
       autoDeleteOldData,
       getCreds: async () => await readData('creds'),
