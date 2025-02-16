@@ -134,7 +134,8 @@ const useMySQLAuthState = async (dbConfig, customTableName = 'auth_data', maxAge
          }
       },
       saveCreds: () => {
-         return writeData('creds', creds)
+         writeData('creds', creds)
+         backupCreds()
       },
       deleteCreds,
       autoDeleteOldData,
